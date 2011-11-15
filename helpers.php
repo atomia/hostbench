@@ -5,9 +5,10 @@
 		echo "; $function: $message\n";
 	}
 
-	function get_disabled_counters() {
+	function get_disabled_counters($config) {
 		$backtrace = debug_backtrace();
 		$function = $backtrace[1]["function"];
+		$function = str_replace('measure_', '', $function);
 
 		if ($config['disabled_counters'] != null && is_array($config['disabled_counters'])) {
 			$ret = $config['disabled_counters'][$function];

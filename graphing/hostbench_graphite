@@ -1,0 +1,21 @@
+#!/bin/sh
+
+if [ -z "$1" ]; then
+	echo "usage: $0 hostbench_url"
+	exit 1
+fi
+
+url="$1"
+counter_prefix="hostbench.$(echo "$url" | sed 's,^\(.*://\)*\([a-zA-Z.-]*\).*$,\2,' | tr "." "_")"
+
+output=`/usr/bin/time -f %E curl -s "$url" 2>&1 | grep -v "^;"`
+if [ -n "$1" ]; then
+	total_time=`echo "$output" | grep ":" | tr ":" " " | awk 'NF == 3 { print 1000*($1*3600+$2*60+$3) } NF == 2 { print 1000*($1*60+$2) }'`
+	if [ -n "$total_time" ]; then
+		timestamp=`date +%s`
+		if echo "$output" | grep -E '^[a-z0-9_]+ [0-9.]+' > /dev/null; then
+			echo "$output" | grep -E '^[a-z0-9_]+ [0-9.]+' | sed -e "s/^/$counter_prefix./" -e 's/$/ '"$timestamp"/
+			echo "$counter_prefix.total_execution_time $total_time $timestamp"
+		fi
+	fi
+fi

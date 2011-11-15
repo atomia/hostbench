@@ -6,7 +6,7 @@
 			return null;
 		}
 
-		$disabled_counters = get_disabled_counters();
+		$disabled_counters = get_disabled_counters($config);
 
 		$insert_closure_stupid = function ($config, $link, $table) {
 			return function ($config, $link) use ($table) {
@@ -38,15 +38,15 @@
 			};
 		};
 
-		$innodb_indexed_stupid = $disabled_counters['innodb_indexed_stupid'] != null ? time_task($insert_closure_stupid($config, $link, "perftest_indexed_innodb"), $config, $link) : null;
-		$myisam_indexed_stupid = $disabled_counters['myisam_indexed_stupid'] != null ? time_task($insert_closure_stupid($config, $link, "perftest_indexed_myisam"), $config, $link) : null;
-		$innodb_stupid = $disabled_counters['innodb_non_indexed_stupid'] != null ? time_task($insert_closure_stupid($config, $link, "perftest_non_indexed_innodb"), $config, $link) : null;
-		$myisam_stupid = $disabled_counters['myisam_non_indexed_stupid'] != null ? time_task($insert_closure_stupid($config, $link, "perftest_non_indexed_myisam"), $config, $link) : null;
+		$innodb_indexed_stupid = false === array_search('innodb_indexed_stupid', $disabled_counters) ? time_task($insert_closure_stupid($config, $link, "perftest_indexed_innodb"), $config, $link) : null;
+		$myisam_indexed_stupid = false === array_search('myisam_indexed_stupid', $disabled_counters) ? time_task($insert_closure_stupid($config, $link, "perftest_indexed_myisam"), $config, $link) : null;
+		$innodb_stupid = false === array_search('innodb_non_indexed_stupid', $disabled_counters) ? time_task($insert_closure_stupid($config, $link, "perftest_non_indexed_innodb"), $config, $link) : null;
+		$myisam_stupid = false === array_search('myisam_non_indexed_stupid', $disabled_counters) ? time_task($insert_closure_stupid($config, $link, "perftest_non_indexed_myisam"), $config, $link) : null;
 
-		$innodb_indexed = $disabled_counters['innodb_indexed'] != null ? time_task($insert_closure($config, $link, "perftest_indexed_innodb"), $config, $link) : null;
-		$myisam_indexed = $disabled_counters['myisam_indexed'] != null ? time_task($insert_closure($config, $link, "perftest_indexed_myisam"), $config, $link) : null;
-		$innodb = $disabled_counters['innodb_non_indexed'] != null ? time_task($insert_closure($config, $link, "perftest_non_indexed_innodb"), $config, $link) : null;
-		$myisam = $disabled_counters['myisam_non_indexed'] != null ? time_task($insert_closure($config, $link, "perftest_non_indexed_myisam"), $config, $link) : null;
+		$innodb_indexed = false === array_search('innodb_indexed', $disabled_counters) ? time_task($insert_closure($config, $link, "perftest_indexed_innodb"), $config, $link) : null;
+		$myisam_indexed = false === array_search('myisam_indexed', $disabled_counters) ? time_task($insert_closure($config, $link, "perftest_indexed_myisam"), $config, $link) : null;
+		$innodb = false === array_search('innodb_non_indexed', $disabled_counters) ? time_task($insert_closure($config, $link, "perftest_non_indexed_innodb"), $config, $link) : null;
+		$myisam = false === array_search('myisam_non_indexed', $disabled_counters) ? time_task($insert_closure($config, $link, "perftest_non_indexed_myisam"), $config, $link) : null;
 
 		return array(
 			'innodb_indexed_stupid' => $innodb_indexed_stupid, 'myisam_indexed_stupid' => $myisam_indexed_stupid, 'innodb_non_indexed_stupid' => $innodb_stupid, 'myisam_non_indexed_stupid' => $myisam_stupid,
